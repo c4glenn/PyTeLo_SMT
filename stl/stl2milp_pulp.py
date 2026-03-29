@@ -17,7 +17,7 @@ class STL2MILPPuLP:
     """
 
     def __init__(self, formula, ranges, vtypes=None, model=None, robust=False, 
-                 solver_name='SCIP'):
+                 solver_name='SCIP', int_rho:bool = False):
         """
         Args:
             formula: STL formula object (from stl.py)
@@ -61,7 +61,10 @@ class STL2MILPPuLP:
         # Create robustness variable if needed
         if robust:
             rho_min, rho_max = self.ranges['rho']
-            self.rho = LpVariable('rho', rho_min, rho_max)
+            if int_rho:
+                self.rho = LpVariable('rho', int(rho_min), int(rho_max), cat=pulp.const.LpInteger)
+            else:
+                self.rho = LpVariable('rho', rho_min, rho_max)
             self.model += self.rho  # Objective: maximize robustness
         else:
             self.rho = 0
